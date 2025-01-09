@@ -23,4 +23,4 @@ Traditional music players require manual playlist creation and mood selection. M
 
 
 ## About
-This app is made by Muffakir Hamid for the event high seas (hack club). I have took help from ai to create this project
+This app is made by Muffakir Hamid for the event high seas (hack club). I have also took help from ai to create this project
