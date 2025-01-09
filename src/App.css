@@ -1,0 +1,95 @@
+.loading-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1e1e1e, #2d2d2d);
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-content {
+  text-align: center;
+  color: white;
+  z-index: 2;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.loading-content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  background: linear-gradient(45deg, #1DB954, #1ED760);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.loading-content p {
+  font-size: 1.2rem;
+  color: #a0a0a0;
+}
+
+.falling-logos {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.logo {
+  position: absolute;
+  font-size: 2rem;
+  animation: fall 8s linear infinite;
+  opacity: 0.3;
+}
+
+.logo i {
+  font-size: 2.5rem;
+}
+
+.fa-spotify {
+  color: #1DB954;
+}
+
+.fa-apple {
+  color: #A2AAAD;
+}
+
+.fa-youtube {
+  color: #FF0000;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  margin: 2rem auto;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: #1DB954;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-100%) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.3;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
