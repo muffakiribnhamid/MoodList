@@ -193,25 +193,9 @@ const MusicPlayer = () => {
 
   return (
     <PlayerContainer>
-      <Nav>
-        <NavLeft>
-          <NavButton onClick={handleBack}>
-            <FaArrowLeft /> Back
-          </NavButton>
-        </NavLeft>
-        <NavCenter>
-          <NavTitle>MoodList</NavTitle>
-        </NavCenter>
-        <NavRight>
-          <NavButton onClick={viewFavorites}>
-            <FaHeart /> Favorites
-          </NavButton>
-          <NavButton as="a" href="https://github.com/muffakiribnhamid" target="_blank" rel="noopener noreferrer">
-            <FaGithub /> GitHub
-          </NavButton>
-        </NavRight>
-      </Nav>
-
+      <BackButton onClick={handleBack}>
+        <FaArrowLeft />
+      </BackButton>
       <MainPlayer>
         <MoodHeader>
           <MoodTitle>Current Mood: <MoodValue>{currentMood?.mood || 'neutral'}</MoodValue></MoodTitle>
@@ -226,13 +210,9 @@ const MusicPlayer = () => {
 
         <NowPlaying>
           {currentTrack ? (
-            <>
-              <AlbumArt src={currentTrack.imageUrl} alt={currentTrack.name} />
-              <TrackInfo>
-                <TrackName>{currentTrack.name}</TrackName>
-                <ArtistName>{currentTrack.artist}</ArtistName>
-              </TrackInfo>
-            </>
+            <AlbumArt>
+              <img src={currentTrack.imageUrl} alt={currentTrack.name} />
+            </AlbumArt>
           ) : (
             <LoadingTrack>
               <WaveformAnimation>
@@ -245,6 +225,10 @@ const MusicPlayer = () => {
               <LoadingText>Loading track...</LoadingText>
             </LoadingTrack>
           )}
+          <TrackInfo>
+            <TrackTitle>{currentTrack?.name}</TrackTitle>
+            <ArtistName>{currentTrack?.artist}</ArtistName>
+          </TrackInfo>
         </NowPlaying>
 
         <Controls>
@@ -262,14 +246,16 @@ const MusicPlayer = () => {
         </Controls>
 
         <ProgressContainer>
-          <TimeText>{formatTime(currentTime)}</TimeText>
+          <TimeInfo>
+            <TimeText>{formatTime(currentTime)}</TimeText>
+            <TimeText>{formatTime(currentTrack?.duration || 0)}</TimeText>
+          </TimeInfo>
           <ProgressBar ref={progressRef} onClick={handleProgressClick}>
             <Progress style={{ width: `${(currentTime / (currentTrack?.duration || 1)) * 100}%` }} />
           </ProgressBar>
-          <TimeText>{formatTime(currentTrack?.duration || 0)}</TimeText>
         </ProgressContainer>
 
-        <VolumeControl>
+        <VolumeContainer>
           <FaVolumeUp />
           <VolumeSlider
             type="range"
@@ -279,36 +265,17 @@ const MusicPlayer = () => {
             value={volume}
             onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
           />
-        </VolumeControl>
+        </VolumeContainer>
 
-        <LikeButton onClick={toggleLike} isLiked={isLiked}>
-          <FaHeart />
-        </LikeButton>
+        <AdditionalControls>
+          <IconButton onClick={toggleLike} active={isLiked}>
+            <FaHeart />
+          </IconButton>
+          <IconButton as="a" href="https://github.com/muffakiribnhamid" target="_blank" rel="noopener noreferrer">
+            <FaGithub />
+          </IconButton>
+        </AdditionalControls>
       </MainPlayer>
-
-      <QueueContainer>
-        <QueueTitle>Next Up</QueueTitle>
-        <QueueList>
-          {tracks.map((track, index) => (
-            <QueueItem 
-              key={track.id}
-              isActive={index === currentTrackIndex}
-              onClick={() => {
-                setCurrentTrackIndex(index);
-                setCurrentTrack(track);
-                musicService.playTrack(track);
-                setIsPlaying(true);
-              }}
-            >
-              <QueueItemImage src={track.imageUrl} alt={track.name} />
-              <QueueItemInfo>
-                <QueueItemName>{track.name}</QueueItemName>
-                <QueueItemArtist>{track.artist}</QueueItemArtist>
-              </QueueItemInfo>
-            </QueueItem>
-          ))}
-        </QueueList>
-      </QueueContainer>
     </PlayerContainer>
   );
 };
@@ -329,88 +296,196 @@ const rotate = keyframes`
 `;
 
 const PlayerContainer = styled.div`
-  display: flex;
-  gap: 2rem;
-  padding: 2rem;
-  background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+  width: 100%;
   min-height: 100vh;
+  background: linear-gradient(to bottom, #1e1e1e, #121212);
   color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 2rem 2rem;
+  position: relative;
+  overflow-x: hidden;
+  
+  @media (max-width: 768px) {
+    padding: 3rem 1rem 1rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 2.5rem 0.5rem 0.5rem;
+  }
+`;
+
+const BackButton = styled.button`
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 10;
+  
+  @media (max-width: 768px) {
+    top: 15px;
+    left: 15px;
+    font-size: 1.3rem;
+  }
+  
+  @media (max-width: 480px) {
+    top: 10px;
+    left: 10px;
+    font-size: 1.2rem;
+  }
 `;
 
 const MainPlayer = styled.div`
-  flex: 2;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 2rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 2rem;
-`;
-
-const QueueContainer = styled.div`
-  flex: 1;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 2rem;
-  max-width: 400px;
+  
+  @media (max-width: 768px) {
+    padding: 10px;
+    gap: 1rem;
+  }
 `;
 
 const NowPlaying = styled.div`
+  width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
 `;
 
-const AlbumArt = styled.img`
-  width: 200px;
-  height: 200px;
+const AlbumArt = styled.div`
+  width: 300px;
+  height: 300px;
   border-radius: 10px;
-  object-fit: cover;
+  overflow: hidden;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  
+  @media (max-width: 768px) {
+    width: 250px;
+    height: 250px;
+  }
+  
+  @media (max-width: 480px) {
+    width: 200px;
+    height: 200px;
+  }
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 `;
 
 const TrackInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  width: 100%;
+  text-align: center;
+  padding: 0 20px;
+  
+  @media (max-width: 768px) {
+    padding: 0 10px;
+  }
 `;
 
-const TrackName = styled.h2`
-  font-size: 1.5rem;
+const TrackTitle = styled.h2`
+  font-size: 1.8rem;
   margin: 0;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  @media (max-width: 768px) {
+    font-size: 1.4rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.2rem;
+  }
 `;
 
 const ArtistName = styled.h3`
-  font-size: 1rem;
-  color: #888;
-  margin: 0;
+  font-size: 1.2rem;
+  color: #b3b3b3;
+  margin: 0.5rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+  }
 `;
 
 const Controls = styled.div`
+  width: 100%;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   gap: 2rem;
+  margin: 1rem 0;
+  
+  @media (max-width: 768px) {
+    gap: 1.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 1rem;
+  }
 `;
 
 const ControlButton = styled.button`
   background: none;
   border: none;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: transform 0.2s;
 
   &:hover {
     transform: scale(1.1);
   }
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+    padding: 0.4rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.3rem;
+    padding: 0.3rem;
+  }
 `;
 
 const PlayButton = styled(ControlButton)`
-  font-size: 2rem;
   width: 60px;
   height: 60px;
   border-radius: 50%;
   background: ${props => props.disabled ? '#165e32' : '#1db954'};
+  font-size: 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -419,112 +494,256 @@ const PlayButton = styled(ControlButton)`
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
 
   &:hover {
+    transform: ${props => props.disabled ? 'none' : 'scale(1.1)'};
     background: ${props => props.disabled ? '#165e32' : '#1ed760'};
+  }
+
+  @media (max-width: 768px) {
+    width: 50px;
+    height: 50px;
+    font-size: 1.8rem;
+  }
+
+  @media (max-width: 480px) {
+    width: 45px;
+    height: 45px;
+    font-size: 1.5rem;
   }
 `;
 
 const ProgressContainer = styled.div`
+  width: 100%;
+  max-width: 600px;
+  padding: 0 20px;
+  
+  @media (max-width: 768px) {
+    padding: 0 10px;
+  }
+`;
+
+const TimeInfo = styled.div`
+  width: 100%;
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  justify-content: space-between;
+  color: #b3b3b3;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  
+  @media (max-width: 480px) {
+    font-size: 0.8rem;
+  }
+`;
+
+const TimeText = styled.span`
+  color: #b3b3b3;
+  font-size: 0.9rem;
+  
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.7rem;
+  }
 `;
 
 const ProgressBar = styled.div`
-  flex: 1;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 2px;
+  width: 100%;
+  height: 5px;
+  background: #4f4f4f;
+  border-radius: 2.5px;
   cursor: pointer;
   position: relative;
+  
+  @media (max-width: 480px) {
+    height: 4px;
+  }
 `;
 
 const Progress = styled.div`
   height: 100%;
-  background: #1db954;
-  border-radius: 2px;
-  position: absolute;
+  background: #1DB954;
+  border-radius: 2.5px;
+  width: ${props => (props.progress || 0)}%;
 `;
 
-const TimeText = styled.span`
-  font-size: 0.8rem;
-  color: #888;
-`;
-
-const VolumeControl = styled.div`
+const VolumeContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+  margin-top: 1rem;
+  
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+  }
+  
+  @media (max-width: 480px) {
+    display: none; /* Hide volume control on mobile */
+  }
 `;
 
 const VolumeSlider = styled.input`
   width: 100px;
-  accent-color: #1db954;
-`;
-
-const LikeButton = styled(ControlButton)`
-  color: ${props => props.isLiked ? '#1db954' : 'white'};
-`;
-
-const QueueTitle = styled.h3`
-  margin: 0 0 1rem 0;
-  font-size: 1.2rem;
-`;
-
-const QueueList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  overflow-y: auto;
-  max-height: calc(100vh - 200px);
-`;
-
-const QueueItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.5rem;
-  border-radius: 10px;
-  cursor: pointer;
-  background: ${props => props.isActive ? 'rgba(29, 185, 84, 0.1)' : 'transparent'};
-  transition: background 0.2s;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
+  
+  @media (max-width: 768px) {
+    width: 80px;
   }
 `;
 
-const QueueItemImage = styled.img`
-  width: 50px;
-  height: 50px;
-  border-radius: 5px;
-  object-fit: cover;
-`;
-
-const QueueItemInfo = styled.div`
+const AdditionalControls = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  gap: 1rem;
+  margin-top: 1rem;
+  
+  @media (max-width: 768px) {
+    gap: 0.8rem;
+  }
+  
+  @media (max-width: 480px) {
+    gap: 0.5rem;
+  }
 `;
 
-const QueueItemName = styled.span`
-  font-size: 0.9rem;
+const IconButton = styled.button`
+  background: none;
+  border: none;
+  color: ${props => props.active ? '#1DB954' : 'white'};
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+  
+  @media (max-width: 768px) {
+    font-size: 1.3rem;
+    padding: 0.4rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.2rem;
+    padding: 0.3rem;
+  }
 `;
 
-const QueueItemArtist = styled.span`
-  font-size: 0.8rem;
-  color: #888;
+const MoodHeader = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  
+  @media (max-width: 768px) {
+    padding: 0.8rem;
+    gap: 0.8rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.6rem;
+    gap: 0.5rem;
+    flex-direction: column;
+  }
+`;
+
+const MoodTitle = styled.h2`
+  margin: 0;
+  font-size: 1.5rem;
+  color: white;
+  
+  @media (max-width: 768px) {
+    font-size: 1.3rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.1rem;
+  }
+`;
+
+const MoodValue = styled.span`
+  color: #1db954;
+  text-transform: capitalize;
+  font-weight: 500;
+  
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1rem;
+  }
+`;
+
+const MoodEmoji = styled.span`
+  font-size: 2rem;
+  
+  @media (max-width: 768px) {
+    font-size: 1.8rem;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1.5rem;
+  }
 `;
 
 const LoadingTrack = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1.5rem;
-  padding: 3rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 15px;
-  min-height: 200px;
+  gap: 1rem;
+  padding: 2rem;
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`;
+
+const LoadingText = styled.div`
+  color: #b3b3b3;
+  font-size: 1rem;
+  
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+  }
+`;
+
+const ErrorText = styled.div`
+  color: white;
+  font-size: 1.2rem;
+  opacity: 0.9;
+  max-width: 400px;
+  text-align: center;
+  margin: 2rem;
+  
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+    margin: 1.5rem;
+    max-width: 300px;
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 1rem;
+    margin: 1rem;
+    max-width: 250px;
+  }
+`;
+
+const LoadingIcon = styled(AiOutlineLoading3Quarters)`
+  animation: ${rotate} 1s linear infinite;
+  font-size: 2rem;
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
 `;
 
 const WaveformAnimation = styled.div`
@@ -542,12 +761,6 @@ const Bar = styled.div`
   animation: ${waveform} 1s ease-in-out infinite;
   animation-delay: ${props => props.delay};
   transform-origin: bottom;
-`;
-
-const LoadingText = styled.div`
-  color: #888;
-  font-size: 1rem;
-  text-align: center;
 `;
 
 const ErrorContainer = styled.div`
@@ -575,92 +788,6 @@ const ErrorMessage = styled.div`
 
 const ErrorIcon = styled.div`
   font-size: 3rem;
-`;
-
-const ErrorText = styled.div`
-  color: white;
-  font-size: 1.2rem;
-  opacity: 0.9;
-  max-width: 400px;
-`;
-
-const LoadingIcon = styled(AiOutlineLoading3Quarters)`
-  animation: ${rotate} 1s linear infinite;
-`;
-
-const MoodHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-`;
-
-const MoodTitle = styled.h2`
-  margin: 0;
-  font-size: 1.5rem;
-  color: white;
-`;
-
-const MoodValue = styled.span`
-  color: #1db954;
-  text-transform: capitalize;
-`;
-
-const MoodEmoji = styled.span`
-  font-size: 2rem;
-`;
-
-const Nav = styled.nav`
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
-  align-items: center;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 15px;
-  margin-bottom: 2rem;
-`;
-
-const NavLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const NavCenter = styled.div``;
-
-const NavRight = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const NavButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: color 0.3s ease;
-  text-decoration: none;
-
-  &:hover {
-    color: #1db954;
-  }
-`;
-
-const NavTitle = styled.h1`
-  color: white;
-  font-size: 1.5rem;
-  margin: 0;
-  font-weight: 600;
 `;
 
 export default MusicPlayer;

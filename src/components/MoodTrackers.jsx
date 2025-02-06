@@ -170,15 +170,25 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
+  padding: 1rem;
   min-height: 100vh;
   background-color: #f5f5f5;
+  
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+  }
 `;
 
 const Title = styled.h1`
   color: #333;
   margin-bottom: 2rem;
   font-size: 2.5rem;
+  text-align: center;
+  
+  @media (max-width: 768px) {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
 `;
 
 const VideoContainer = styled.div`
@@ -189,6 +199,12 @@ const VideoContainer = styled.div`
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: 768px) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4/3;
+  }
 `;
 
 const Video = styled.video`
@@ -201,70 +217,98 @@ const Canvas = styled.canvas`
   position: absolute;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
 `;
 
 const CurrentMoodDisplay = styled.div`
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 20px;
+  left: 20px;
   background: rgba(255, 255, 255, 0.9);
-  padding: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
+  gap: 0.5rem;
+  
+  @media (max-width: 768px) {
+    bottom: 10px;
+    left: 10px;
+    padding: 0.3rem 0.8rem;
+  }
 `;
 
 const MoodEmoji = styled.span`
   font-size: 2rem;
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
 `;
 
 const MoodLabel = styled.span`
   font-size: 1.2rem;
-  color: #333;
-  font-weight: bold;
-`;
-
-const LoadingText = styled.div`
-  font-size: 1.5rem;
-  color: #666;
-`;
-
-const ErrorMessage = styled.div`
-  color: #ff4444;
-  font-size: 1.2rem;
-  text-align: center;
+  font-weight: 500;
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 `;
 
 const CaptureButton = styled.button`
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-  padding: 12px 24px;
-  font-size: 1.2rem;
-  font-weight: 600;
+  gap: 0.5rem;
+  background: #4CAF50;
   color: white;
-  background: #6c5ce7;
   border: none;
-  border-radius: 30px;
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  font-size: 1.2rem;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.2);
+  margin-top: 2rem;
+  transition: background 0.3s ease;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(108, 92, 231, 0.3);
+    background: #45a049;
   }
-
-  &:active {
-    transform: translateY(0);
+  
+  @media (max-width: 768px) {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    margin-top: 1rem;
   }
 `;
 
 const CaptureIcon = styled.span`
-  font-size: 1.4rem;
+  font-size: 1.5rem;
+  
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
+`;
+
+const ErrorMessage = styled.div`
+  color: #d32f2f;
+  font-size: 1.2rem;
+  text-align: center;
+  margin: 2rem;
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    margin: 1rem;
+  }
+`;
+
+const LoadingText = styled.div`
+  font-size: 1.2rem;
+  color: #666;
+  text-align: center;
+  
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 `;
 
 export default MoodTrackers;
